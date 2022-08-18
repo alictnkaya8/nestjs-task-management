@@ -30,11 +30,17 @@ export class TasksService {
         return task;
     }
 
-    deleteTask(id: string): Task {
-        const deleteTask = this.tasks.find((task) => task.id === id);
+    deleteTask(id: string): void {
+        // best practice 
+        // this.tasks = this.tasks.filter((task) => task.id !== id);
 
-        const deleteIndex = this.tasks.indexOf(deleteTask);
-        this.tasks.splice(deleteIndex);
-        return deleteTask;
+        const deleteTask = this.tasks.findIndex((task) => task.id === id);
+        this.tasks.splice(deleteTask);
+    }
+
+    updateTaskStatus(id: string, status: TaskStatus): Task {
+        const updateTaskIndex = this.tasks.findIndex((task) => task.id === id);
+        this.tasks[updateTaskIndex].status = status;
+        return this.tasks[updateTaskIndex];
     }
 }
