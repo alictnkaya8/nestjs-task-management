@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Task } from './task.entity';
 import { TasksController } from './tasks.controller';
 import { TasksRepository } from './tasks.repository';
 import { TasksService } from './tasks.service';
@@ -11,4 +12,4 @@ import { TasksService } from './tasks.service';
   controllers: [TasksController],
   providers: [TasksService],
 })
-export class TasksModule {}
+export class TasksModule { }
