@@ -7,6 +7,9 @@ import { TasksService } from './tasks.service';
 const mockTasksRepository = () => ({
   getTasks: jest.fn(),
   findOne: jest.fn(),
+  createTask: jest.fn(),
+  delete: jest.fn(),
+  save: jest.fn(),
 });
 
 const mockUser = {
@@ -15,6 +18,13 @@ const mockUser = {
   password: 'somePassword',
   tasks: [],
 }
+
+const mockTask = {
+  title: 'Test title',
+  description: 'Test desc',
+  id: 'someId',
+  status: TaskStatus.OPEN,
+};
 
 describe('TasksService', () => {
   let tasksService: TasksService;
@@ -42,21 +52,44 @@ describe('TasksService', () => {
 
   describe('getTaskById', () => {
     it('calls TasksRepository.findOne and returns the result', async () => {
-      const mockTask = {
-        title: 'Test title',
-        description: 'Test desc',
-        id: 'someId',
-        status: TaskStatus.OPEN,
-      };
-
       tasksRepository.findOne.mockResolvedValue(mockTask);
-      const result = await tasksService.getTaskById('someId', mockUser);
+      const result = await tasksService.getTaskById(mockTask.id, mockUser);
       expect(result).toEqual(mockTask);
     });
 
     it('calls TasksRepository.findOne and handles an error', async () => {
       tasksRepository.findOne.mockResolvedValue(null);
-      expect(tasksService.getTaskById('someId', mockUser)).rejects.toThrow(NotFoundException);
+      expect(tasksService.getTaskById(mockTask.id, mockUser)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('createTask', () => {
+    it('calls TasksRepository.createTask and create new task', async () => {
+      const mockTaskDto = {
+        title: 'Test title',
+        description: 'Test desc',
+      };
+      tasksRepository.createTask.mockResolvedValue(mockTaskDto);
+      const result = await tasksService.createTask(mockTaskDto, mockUser);
+      expect(result).toEqual(mockTaskDto);
+    });
+  });
+
+  describe('deleteTask', () => {
+    it('calls TasksRepository.delete and delete the task', async () => {
+      tasksRepository.delete.mockResolvedValue(mockTask.id);
+      const result = await tasksService.deleteTask(mockTask.id, mockUser)
+      expect(result).toEqual(true);
+    });
+  });
+  describe('updateTaskStatus', () => {
+    it("calls TasksRepository.save and update the task's status", async () => {
+      tasksRepository.findOne.mockResolvedValue(mockTask.id);
+      await tasksService.getTaskById(mockTask.id, mockUser);
+      mockTask.status = TaskStatus.IN_PROGRESS;
+      await tasksRepository.save(mockTask);
+      const result = mockTask.status;
+      expect(result).toEqual(TaskStatus.IN_PROGRESS);
     });
   });
 });
